@@ -101,6 +101,35 @@
   .intro { max-width: 640px; margin: 0 auto 2rem; text-align: center; }
   .intro h2 { font-size: 1.1rem; }
   .intro p { color: var(--muted); }
+
+  .breakdown-details {
+    margin-top: 1.25rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+  }
+  .breakdown-details summary {
+    cursor: pointer;
+    font-size: 0.85rem;
+    color: var(--accent);
+    user-select: none;
+  }
+  .breakdown-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 0.75rem;
+    font-size: 0.85rem;
+  }
+  .breakdown-table td {
+    padding: 0.4rem 0.25rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .breakdown-table td:last-child { text-align: right; font-weight: 600; }
+  .breakdown-note {
+    display: block;
+    font-size: 0.72rem;
+    color: var(--muted-2);
+    font-weight: 400;
+  }
 </style>
 </head>
 <body>
@@ -163,8 +192,12 @@
           <span class="value" id="leaveImpact"></span>
         </div>
         <div class="result-row">
-          <span class="label">발생 연차</span>
+          <span class="label">발생 연차 (올해분)</span>
           <span class="value" id="earned"></span>
+        </div>
+        <div class="result-row">
+          <span class="label">입사 후 누적 발생 연차</span>
+          <span class="value" id="cumulativeEarned"></span>
         </div>
         <div class="result-row">
           <span class="label">사용 연차</span>
@@ -174,6 +207,13 @@
           <span class="label">잔여 연차</span>
           <span class="value" id="remaining"></span>
         </div>
+
+        <details class="breakdown-details">
+          <summary>연도별(월별) 발생 내역 보기</summary>
+          <table class="breakdown-table" id="breakdownTable">
+            <tbody id="breakdownBody"></tbody>
+          </table>
+        </details>
       </div>
 
       <p class="note">
@@ -182,7 +222,11 @@
         무급휴직 기간은, 1년 미만 구간에서는 휴직이 걸친 달을 개근하지 않은 것으로 보아 그 달의 1일을 제외하고,
         1년 이상 구간에서는 현재 연차를 발생시킨 산정기간(직전 1년) 중 휴직이 차지하는 비율만큼 발생일수를 비례 차감하는 방식(근사치)으로 반영합니다.
         회사 내부 규정 및 실제 판례 해석에 따라 결과가 달라질 수 있으니 참고용으로만 사용하세요. 자세한 계산 근거는
-        <a href="/guide.html">연차휴가 가이드</a>에서 확인하세요.
+        <a href="/guide.html">연차휴가 가이드</a>에서 확인하세요.<br /><br />
+        <strong>입사 후 누적 발생 연차</strong>는 입사일부터 지금까지 매년 발생했던 연차 일수를
+        전부 단순 합산한 참고용 숫자입니다. 실제로는 그해 사용하지 않은 연차가 통상 1년 뒤
+        소멸(대신 연차수당으로 정산)되므로, 이 누적치가 지금 실제로 쓸 수 있는 잔여 연차를
+        의미하지는 않습니다. 지금 쓸 수 있는 연차는 위 "잔여 연차"를 기준으로 확인하세요.
       </p>
     </div>
 
@@ -226,6 +270,11 @@
     return daysBetween(start, end);
   }
 
+  // 근속연수 k년째 도래 시점(k번째 입사기념일)에 발생하는 연차일수 (기본 공식, 휴직 미반영)
+  function grantAtYear(k) {
+    return Math.min(15 + Math.floor((k - 1) / 2), 25);
+  }
+
   function calcAnnualLeave(hireDate, today, leaveStart, leaveEnd) {
     if (today < hireDate) return null;
 
@@ -245,6 +294,8 @@
     let earned;
     let tenureLabel;
     let leaveImpactLabel = null;
+    let cumulativeEarned;
+    let breakdown;
 
     if (years < 1) {
       // 1년 미만: 무급휴직이 걸친 달은 개근하지 않은 것으로 보아 그 달의 1일을 제외
@@ -263,6 +314,19 @@
       tenureLabel = months + "개월";
       if (excludedMonths > 0) {
         leaveImpactLabel = "휴직 포함 " + excludedMonths + "개월 미개근 처리";
+      }
+      cumulativeEarned = earned;
+
+      breakdown = [];
+      for (let i = 0; i < months; i++) {
+        const mStart = addMonths(hireDate, i);
+        const mEnd = addMonths(hireDate, i + 1);
+        const excluded = hasLeave && overlapDays(mStart, mEnd, leaveStart, leaveEnd) > 0;
+        breakdown.push({
+          label: (i + 1) + "개월차",
+          days: excluded ? 0 : 1,
+          note: excluded ? "무급휴직으로 미개근 처리" : ""
+        });
       }
     } else {
       const bonus = Math.floor((years - 1) / 2);
@@ -284,9 +348,31 @@
       } else {
         earned = baseEarned;
       }
+
+      // 누적 발생 연차 (참고용, 단순 합산): 최초 1년 미만 구간 최대 11일
+      // + 1~(years-1)번째 입사기념일에 발생한 연차 + 이번 해 발생 연차(휴직 반영치)
+      let cumulative = 11;
+      for (let k = 1; k <= years - 1; k++) {
+        cumulative += grantAtYear(k);
+      }
+      cumulativeEarned = cumulative + earned;
+
+      breakdown = [{
+        label: "입사~1년차 도래 전 (매월 개근분)",
+        days: 11,
+        note: ""
+      }];
+      for (let k = 1; k <= years - 1; k++) {
+        breakdown.push({ label: k + "년차", days: grantAtYear(k), note: "" });
+      }
+      breakdown.push({
+        label: years + "년차 (올해)",
+        days: earned,
+        note: leaveImpactLabel ? "무급휴직 비례 차감 반영" : ""
+      });
     }
 
-    return { earned, tenureLabel, leaveImpactLabel };
+    return { earned, cumulativeEarned, tenureLabel, leaveImpactLabel, breakdown };
   }
 
   const leaveToggle = document.getElementById("leaveToggle");
@@ -344,6 +430,7 @@
 
     document.getElementById("tenure").textContent = result.tenureLabel;
     document.getElementById("earned").textContent = result.earned + "일";
+    document.getElementById("cumulativeEarned").textContent = result.cumulativeEarned + "일";
     document.getElementById("used").textContent = used + "일";
     document.getElementById("remaining").textContent = remaining + "일";
 
@@ -354,6 +441,25 @@
     } else {
       leaveRow.style.display = "none";
     }
+
+    const breakdownBody = document.getElementById("breakdownBody");
+    breakdownBody.innerHTML = "";
+    result.breakdown.forEach(function (row) {
+      const tr = document.createElement("tr");
+      const labelTd = document.createElement("td");
+      labelTd.textContent = row.label;
+      if (row.note) {
+        const noteEl = document.createElement("span");
+        noteEl.className = "breakdown-note";
+        noteEl.textContent = row.note;
+        labelTd.appendChild(noteEl);
+      }
+      const daysTd = document.createElement("td");
+      daysTd.textContent = row.days + "일";
+      tr.appendChild(labelTd);
+      tr.appendChild(daysTd);
+      breakdownBody.appendChild(tr);
+    });
 
     document.getElementById("result").classList.add("visible");
   });
