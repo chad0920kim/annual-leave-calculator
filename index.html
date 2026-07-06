@@ -3,70 +3,58 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>연차 계산기</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Ctext y=%27.9em%27 font-size=%2790%27%3E%F0%9F%97%93%EF%B8%8F%3C/text%3E%3C/svg%3E" />
+<title>연차 계산기 - 입사일 기준 연차휴가 자동 계산 | 직장인 연차 계산기</title>
+<meta name="description" content="입사일만 입력하면 근로기준법 기준 발생 연차와 잔여 연차를 바로 계산합니다. 무급휴직 기간을 반영한 정확한 연차 계산도 지원합니다." />
+<link rel="canonical" href="https://hello-cloudflare-5zh.pages.dev/" />
+<meta property="og:title" content="연차 계산기 - 입사일 기준 연차휴가 자동 계산" />
+<meta property="og:description" content="입사일만 입력하면 근로기준법 기준 발생 연차와 잔여 연차를 바로 계산합니다." />
+<meta property="og:type" content="website" />
+<link rel="stylesheet" href="/style.css" />
 <style>
-  * { box-sizing: border-box; }
-  body {
-    margin: 0;
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 2rem 1rem;
-    background: #0f172a;
-    color: #e2e8f0;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  }
-  .card {
-    width: 100%;
-    max-width: 480px;
-    padding: 2.5rem;
-    border-radius: 1rem;
-    background: #1e293b;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-  }
-  h1 { margin: 0 0 0.25rem; font-size: 1.5rem; text-align: center; }
-  .subtitle { margin: 0 0 2rem; color: #94a3b8; text-align: center; font-size: 0.9rem; }
+  .calc-card { max-width: 480px; margin: 0 auto; }
+  .calc-card h1 { margin: 0 0 0.25rem; font-size: 1.5rem; text-align: center; }
+  .calc-card .subtitle { margin: 0 0 2rem; color: var(--muted); text-align: center; font-size: 0.9rem; }
 
   label {
     display: block;
     font-size: 0.85rem;
-    color: #94a3b8;
+    color: var(--muted);
     margin-bottom: 0.4rem;
   }
   .field { margin-bottom: 1.25rem; }
   .field-group { margin-bottom: 1.25rem; }
   .field-row { display: flex; align-items: center; gap: 0.5rem; }
-  .field-row .tilde { color: #64748b; }
+  .field-row .tilde { color: var(--muted-2); }
   input[type="date"],
   input[type="number"] {
     width: 100%;
     padding: 0.65rem 0.8rem;
     border-radius: 0.5rem;
-    border: 1px solid #334155;
-    background: #0f172a;
-    color: #e2e8f0;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--text);
     font-size: 1rem;
   }
-  input:focus { outline: 2px solid #38bdf8; outline-offset: 1px; }
+  input:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
 
   button {
     width: 100%;
     padding: 0.75rem;
     border: none;
     border-radius: 0.5rem;
-    background: #38bdf8;
-    color: #0f172a;
+    background: var(--accent);
+    color: var(--bg);
     font-size: 1rem;
     font-weight: 600;
     cursor: pointer;
   }
-  button:hover { background: #0ea5e9; }
+  button:hover { background: var(--accent-dark); }
 
   .result {
     margin-top: 1.75rem;
     padding-top: 1.5rem;
-    border-top: 1px solid #334155;
+    border-top: 1px solid var(--border);
     display: none;
   }
   .result.visible { display: block; }
@@ -76,72 +64,114 @@
     padding: 0.4rem 0;
     font-size: 0.95rem;
   }
-  .result-row .label { color: #94a3b8; }
+  .result-row .label { color: var(--muted); }
   .result-row .value { font-weight: 600; }
-  .result-row.total .value { color: #38bdf8; font-size: 1.3rem; }
+  .result-row.total .value { color: var(--accent); font-size: 1.3rem; }
 
   .note {
     margin-top: 1rem;
     font-size: 0.78rem;
-    color: #64748b;
+    color: var(--muted-2);
     line-height: 1.5;
   }
+
+  .intro { max-width: 640px; margin: 0 auto 2rem; text-align: center; }
+  .intro h2 { font-size: 1.1rem; }
+  .intro p { color: var(--muted); }
 </style>
 </head>
 <body>
-  <div class="card">
-    <h1>연차 계산기 🗓️</h1>
-    <p class="subtitle">입사일 기준으로 발생한 연차 유급휴가를 계산합니다</p>
+  <header class="site-header">
+    <div class="inner">
+      <a class="brand" href="/">직장인 연차 계산기</a>
+      <nav class="site-nav">
+        <a href="/" class="active">연차 계산기</a>
+        <a href="/guide.html">연차휴가 가이드</a>
+        <a href="/blog/">연차 이야기</a>
+        <a href="/about.html">소개</a>
+        <a href="/contact.html">문의</a>
+      </nav>
+    </div>
+  </header>
 
-    <div class="field">
-      <label for="hireDate">입사일</label>
-      <input type="date" id="hireDate" />
-    </div>
-    <div class="field">
-      <label for="usedDays">이미 사용한 연차 일수 (선택)</label>
-      <input type="number" id="usedDays" min="0" step="0.5" value="0" />
-    </div>
-    <div class="field-group">
-      <label>무급휴직 기간 (선택)</label>
-      <div class="field-row">
-        <input type="date" id="leaveStart" aria-label="무급휴직 시작일" />
-        <span class="tilde">~</span>
-        <input type="date" id="leaveEnd" aria-label="무급휴직 종료일" />
-      </div>
-    </div>
-    <button id="calcBtn">계산하기</button>
-
-    <div class="result" id="result">
-      <div class="result-row">
-        <span class="label">근속 기간</span>
-        <span class="value" id="tenure"></span>
-      </div>
-      <div class="result-row" id="leaveRow" style="display:none;">
-        <span class="label">무급휴직 반영</span>
-        <span class="value" id="leaveImpact"></span>
-      </div>
-      <div class="result-row">
-        <span class="label">발생 연차</span>
-        <span class="value" id="earned"></span>
-      </div>
-      <div class="result-row">
-        <span class="label">사용 연차</span>
-        <span class="value" id="used"></span>
-      </div>
-      <div class="result-row total">
-        <span class="label">잔여 연차</span>
-        <span class="value" id="remaining"></span>
-      </div>
+  <main>
+    <div class="intro">
+      <h2>입사일 하나로 끝내는 연차 계산</h2>
+      <p>
+        복잡한 근로기준법 조항을 몰라도 괜찮습니다. 입사일과 이미 사용한 연차,
+        무급휴직 기간(있는 경우)만 입력하면 현재까지 발생한 연차휴가 일수와
+        잔여 연차를 바로 확인할 수 있습니다. 계산 기준이 궁금하다면
+        <a href="/guide.html">연차휴가 완벽 가이드</a>를 참고하세요.
+      </p>
     </div>
 
-    <p class="note">
-      근로기준법 기준: 입사 1년 미만은 매월 개근 시 1일(최대 11일),
-      1년 이상은 15일에 최초 1년 초과 매 2년마다 1일 가산(최대 25일)하여 계산합니다.
-      무급휴직 기간은, 1년 미만 구간에서는 휴직이 걸친 달을 개근하지 않은 것으로 보아 그 달의 1일을 제외하고,
-      1년 이상 구간에서는 현재 연차를 발생시킨 산정기간(직전 1년) 중 휴직이 차지하는 비율만큼 발생일수를 비례 차감하는 방식(근사치)으로 반영합니다.
-      회사 내부 규정 및 실제 판례 해석에 따라 결과가 달라질 수 있으니 참고용으로만 사용하세요.
-    </p>
-  </div>
+    <div class="card calc-card">
+      <h1>연차 계산기 🗓️</h1>
+      <p class="subtitle">입사일 기준으로 발생한 연차 유급휴가를 계산합니다</p>
+
+      <div class="field">
+        <label for="hireDate">입사일</label>
+        <input type="date" id="hireDate" />
+      </div>
+      <div class="field">
+        <label for="usedDays">이미 사용한 연차 일수 (선택)</label>
+        <input type="number" id="usedDays" min="0" step="0.5" value="0" />
+      </div>
+      <div class="field-group">
+        <label>무급휴직 기간 (선택)</label>
+        <div class="field-row">
+          <input type="date" id="leaveStart" aria-label="무급휴직 시작일" />
+          <span class="tilde">~</span>
+          <input type="date" id="leaveEnd" aria-label="무급휴직 종료일" />
+        </div>
+      </div>
+      <button id="calcBtn">계산하기</button>
+
+      <div class="result" id="result">
+        <div class="result-row">
+          <span class="label">근속 기간</span>
+          <span class="value" id="tenure"></span>
+        </div>
+        <div class="result-row" id="leaveRow" style="display:none;">
+          <span class="label">무급휴직 반영</span>
+          <span class="value" id="leaveImpact"></span>
+        </div>
+        <div class="result-row">
+          <span class="label">발생 연차</span>
+          <span class="value" id="earned"></span>
+        </div>
+        <div class="result-row">
+          <span class="label">사용 연차</span>
+          <span class="value" id="used"></span>
+        </div>
+        <div class="result-row total">
+          <span class="label">잔여 연차</span>
+          <span class="value" id="remaining"></span>
+        </div>
+      </div>
+
+      <p class="note">
+        근로기준법 기준: 입사 1년 미만은 매월 개근 시 1일(최대 11일),
+        1년 이상은 15일에 최초 1년 초과 매 2년마다 1일 가산(최대 25일)하여 계산합니다.
+        무급휴직 기간은, 1년 미만 구간에서는 휴직이 걸친 달을 개근하지 않은 것으로 보아 그 달의 1일을 제외하고,
+        1년 이상 구간에서는 현재 연차를 발생시킨 산정기간(직전 1년) 중 휴직이 차지하는 비율만큼 발생일수를 비례 차감하는 방식(근사치)으로 반영합니다.
+        회사 내부 규정 및 실제 판례 해석에 따라 결과가 달라질 수 있으니 참고용으로만 사용하세요. 자세한 계산 근거는
+        <a href="/guide.html">연차휴가 가이드</a>에서 확인하세요.
+      </p>
+    </div>
+
+    <div class="ad-slot">광고 영역 (심사 승인 후 게재 예정)</div>
+  </main>
+
+  <footer class="site-footer">
+    <nav>
+      <a href="/about.html">소개</a>
+      <a href="/privacy.html">개인정보처리방침</a>
+      <a href="/terms.html">이용약관</a>
+      <a href="/contact.html">문의</a>
+    </nav>
+    <p>&copy; 2026 직장인 연차 계산기. 본 사이트의 계산 결과는 참고용이며 법적 효력이 없습니다.</p>
+  </footer>
 
 <script>
   const MS_PER_DAY = 86400000;

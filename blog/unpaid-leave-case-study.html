@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Ctext y=%27.9em%27 font-size=%2790%27%3E%F0%9F%97%93%EF%B8%8F%3C/text%3E%3C/svg%3E" />
+<title>무급휴직 다녀왔더니 연차가 줄었어요 | 연차 이야기</title>
+<meta name="description" content="3개월 무급휴직 후 복직한 근로자의 실제 연차 계산 과정을 단계별로 따라가 봅니다." />
+<link rel="canonical" href="https://hello-cloudflare-5zh.pages.dev/blog/unpaid-leave-case-study.html" />
+<link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="inner">
+      <a class="brand" href="/">직장인 연차 계산기</a>
+      <nav class="site-nav">
+        <a href="/">연차 계산기</a>
+        <a href="/guide.html">연차휴가 가이드</a>
+        <a href="/blog/" class="active">연차 이야기</a>
+        <a href="/about.html">소개</a>
+        <a href="/contact.html">문의</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <h1 class="page-title">무급휴직 다녀왔더니 연차가 줄었어요</h1>
+    <p class="page-lead">실제 사례로 보는 계산 · 2026.06.04</p>
+    <img src="https://images.pexels.com/photos/20297117/pexels-photo-20297117.jpeg?auto=compress&cs=tinysrgb&w=1200" alt="비어 있는 사무실 의자" style="width:100%; border-radius:0.75rem; margin-bottom:1.5rem;" loading="lazy" />
+
+    <article>
+      <p>
+        입사 3년 6개월차 직장인 C씨는 개인 사정으로 3개월간 무급휴직을
+        다녀왔습니다. 복직 후 연차 개수를 확인해보니 예상보다 적어서
+        당황했다는 이야기를 종종 듣습니다. 왜 이런 차이가 생기는지 실제
+        숫자로 따라가 보겠습니다.
+      </p>
+
+      <h2>기본 정보</h2>
+      <ul>
+        <li>입사일: 2023년 1월 7일</li>
+        <li>현재 근속: 3년 6개월 (오늘 기준)</li>
+        <li>무급휴직 기간: 2025년 3월 1일 ~ 2025년 5월 30일 (약 90일)</li>
+      </ul>
+
+      <h2>1단계 - 휴직이 없었다면?</h2>
+      <p>
+        근속연수 3년차는 기본 15일에 최초 1년 초과 매 2년마다 1일 가산되는
+        규정에 따라 16일의 연차가 발생합니다. 휴직이 없었다면 C씨는 16일을
+        온전히 받았을 것입니다.
+      </p>
+
+      <h2>2단계 - 휴직이 어느 기간에 걸렸는지 확인</h2>
+      <p>
+        현재 발생한 16일의 연차는 "직전 1년" 즉 2025년 1월 7일부터 2026년
+        1월 7일까지의 근무를 기준으로 산정됩니다. C씨의 무급휴직(2025년
+        3월 1일~5월 30일)은 정확히 이 산정기간 안에 포함됩니다.
+      </p>
+
+      <h2>3단계 - 비례 계산 적용</h2>
+      <p>
+        산정기간 365일 중 90일이 무급휴직이었으므로, 실제 근무한 비율은
+        (365-90)/365 ≈ 75.3%입니다. 이 비율을 16일에 적용하면
+        16 × 0.753 ≈ 12일이 됩니다.
+      </p>
+      <p>
+        즉 C씨는 휴직이 없었다면 16일을 받았겠지만, 90일의 무급휴직으로
+        인해 실질적으로 12일 정도로 조정되는 것이 합리적인 근사치입니다.
+        만약 무급휴직 기간이 산정기간과 겹치지 않았다면(예: 이미 지나간
+        예전 연도의 휴직이라면) 현재 연차에는 영향을 주지 않습니다.
+      </p>
+
+      <h2>왜 이렇게 계산될까?</h2>
+      <p>
+        연차휴가는 원칙적으로 "1년간 소정의 근로를 제공했는지"를 전제로
+        발생합니다. 무급휴직처럼 근로 제공 의무 자체가 없었던 기간은
+        결근과 동일하게 취급하지는 않지만, 실제로 일하지 않은 기간인 만큼
+        발생하는 연차도 그 비율만큼 조정되는 것이 실무에서 널리 통용되는
+        해석입니다.
+      </p>
+      <p>
+        다만 이는 회사마다, 그리고 휴직의 성격(육아휴직처럼 법정 보호를
+        받는 휴직인지, 개인 사정에 의한 휴직인지)에 따라 달라질 수 있는
+        영역입니다. 본인의 정확한 상황은 인사팀 확인이 가장 정확합니다.
+      </p>
+      <p>
+        비슷한 상황이라면 <a href="/">연차 계산기</a>에 입사일과 무급휴직
+        기간을 넣어 직접 확인해보세요.
+      </p>
+    </article>
+
+    <p><a href="/blog/">&larr; 연차 이야기 목록으로</a></p>
+  </main>
+
+  <footer class="site-footer">
+    <nav>
+      <a href="/about.html">소개</a>
+      <a href="/privacy.html">개인정보처리방침</a>
+      <a href="/terms.html">이용약관</a>
+      <a href="/contact.html">문의</a>
+    </nav>
+    <p>&copy; 2026 직장인 연차 계산기. 본 사이트의 계산 결과는 참고용이며 법적 효력이 없습니다.</p>
+  </footer>
+</body>
+</html>
