@@ -90,15 +90,74 @@
     display: none;
   }
   .result.visible { display: block; }
-  .result-row {
+
+  .result-head {
     display: flex;
+    align-items: center;
     justify-content: space-between;
-    padding: 0.4rem 0;
-    font-size: 0.95rem;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
   }
-  .result-row .label { color: var(--muted); }
-  .result-row .value { font-weight: 600; }
-  .result-row.total .value { color: var(--accent); font-size: 1.3rem; }
+  .eyebrow {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: var(--accent);
+    text-transform: uppercase;
+  }
+  .result-badge {
+    padding: 0.3rem 0.65rem;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 0.78rem;
+    white-space: nowrap;
+  }
+
+  .metric-card {
+    border-radius: 0.65rem;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    padding: 1rem 1.1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+  .metric-label, .sub-label { font-size: 0.78rem; color: var(--muted); }
+  .metric-value {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.9rem;
+    line-height: 1.1;
+    color: var(--text);
+  }
+  .sub-value {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1.15rem;
+    color: var(--text);
+  }
+  .card-hero.accent-bg {
+    border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+    background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 12%, transparent), transparent 60%), var(--bg);
+  }
+  .card-hero.accent-bg .metric-value { color: var(--accent); }
+
+  .result-hero-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+  }
+  .result-sub-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.6rem;
+  }
+  @media (max-width: 420px) {
+    .result-hero-grid { grid-template-columns: 1fr; }
+    .result-sub-grid { grid-template-columns: 1fr; }
+  }
 
   .note {
     margin-top: 1rem;
@@ -201,29 +260,35 @@
       <button id="calcBtn">계산하기</button>
 
       <div class="result" id="result">
-        <div class="result-row">
-          <span class="label">근속 기간</span>
-          <span class="value" id="tenure"></span>
+        <div class="result-head">
+          <span class="eyebrow">계산 결과</span>
+          <span class="result-badge">근속 <span id="tenure"></span></span>
         </div>
-        <div class="result-row" id="leaveRow" style="display:none;">
-          <span class="label">무급휴직 반영</span>
-          <span class="value" id="leaveImpact"></span>
+
+        <div class="result-hero-grid">
+          <div class="metric-card card-hero accent-bg">
+            <span class="metric-label">잔여 연차</span>
+            <span class="metric-value" id="remaining"></span>
+          </div>
+          <div class="metric-card card-hero">
+            <span class="metric-label">발생 연차 (올해분)</span>
+            <span class="metric-value" id="earned"></span>
+          </div>
         </div>
-        <div class="result-row">
-          <span class="label">발생 연차 (올해분)</span>
-          <span class="value" id="earned"></span>
-        </div>
-        <div class="result-row">
-          <span class="label">입사 후 누적 발생 연차</span>
-          <span class="value" id="cumulativeEarned"></span>
-        </div>
-        <div class="result-row">
-          <span class="label">사용 연차</span>
-          <span class="value" id="used"></span>
-        </div>
-        <div class="result-row total">
-          <span class="label">잔여 연차</span>
-          <span class="value" id="remaining"></span>
+
+        <div class="result-sub-grid">
+          <div class="metric-card card-sub">
+            <span class="sub-label">사용 연차</span>
+            <span class="sub-value" id="used"></span>
+          </div>
+          <div class="metric-card card-sub">
+            <span class="sub-label">입사 후 누적 발생</span>
+            <span class="sub-value" id="cumulativeEarned"></span>
+          </div>
+          <div class="metric-card card-sub" id="leaveRow" style="display:none;">
+            <span class="sub-label">무급휴직 반영</span>
+            <span class="sub-value" id="leaveImpact"></span>
+          </div>
         </div>
 
         <details class="breakdown-details">
