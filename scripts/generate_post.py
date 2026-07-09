@@ -67,7 +67,8 @@ def build_prompt(posts):
   ]
 }}
 
-전체 본문은 700~1100자 분량의 한글로 작성하고, 각 문단은 3~6문장으로 구성하세요."""
+전체 본문은 700~1100자 분량의 한글로 작성하고, 각 문단은 3~6문장으로 구성하세요.
+paragraphs 안의 텍스트는 순수 문장으로만 작성하고 마크다운 문법(**, #, - 등)은 절대 쓰지 마세요."""
 
 
 def call_gemini(prompt):
@@ -126,6 +127,15 @@ def pick_image(posts):
     return pool[len(posts) % len(pool)]
 
 
+def format_inline(text):
+    parts = re.split(r"\*\*(.+?)\*\*", text)
+    out = []
+    for i, part in enumerate(parts):
+        escaped = html.escape(part, quote=True)
+        out.append(f"<strong>{escaped}</strong>" if i % 2 == 1 else escaped)
+    return "".join(out)
+
+
 def render_html(post, date_str):
     e = lambda s: html.escape(s, quote=True)
     title = post["title"]
@@ -137,7 +147,7 @@ def render_html(post, date_str):
 
     sections_html = ""
     for sec in post["sections"]:
-        paras = "\n".join(f"      <p>\n        {e(p)}\n      </p>" for p in sec["paragraphs"])
+        paras = "\n".join(f"      <p>\n        {format_inline(p)}\n      </p>" for p in sec["paragraphs"])
         sections_html += f"      <h2>{e(sec['heading'])}</h2>\n{paras}\n"
 
     json_ld = json.dumps(
