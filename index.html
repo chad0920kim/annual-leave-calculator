@@ -329,6 +329,8 @@
             <tbody id="breakdownBody"></tbody>
           </table>
         </details>
+
+        <button id="kakaoShareBtn" type="button" style="margin-top:1rem; background:#FEE500; color:#191600;">💬 카카오톡으로 공유하기</button>
       </div>
 
       <p class="note">
@@ -355,6 +357,7 @@
     <p>&copy; 2026 직장인 연차 계산기. 본 사이트의 계산 결과는 참고용이며 법적 효력이 없습니다.</p>
   </footer>
 
+<script src="https://developers.kakao.com/sdk/js/kakao.js"></script>
 <script>
   const MS_PER_DAY = 86400000;
 
@@ -618,6 +621,45 @@
 
     document.getElementById("result").classList.add("visible");
   });
+
+  // 카카오톡 공유 — Kakao Developers에서 발급받은 JavaScript 키로 교체 필요.
+  (function () {
+    var KAKAO_JS_KEY = "7ca38962627b87e0762f217413301c3c";
+    var configured = KAKAO_JS_KEY.indexOf("YOUR_") !== 0;
+    if (window.Kakao && configured && !Kakao.isInitialized()) {
+      Kakao.init(KAKAO_JS_KEY);
+    }
+
+    document.getElementById("kakaoShareBtn").addEventListener("click", function () {
+      if (!window.Kakao || !configured) {
+        alert("카카오톡 공유가 아직 연결되지 않았습니다. (관리자: index.html의 Kakao JS 키 설정을 완료해 주세요.)");
+        return;
+      }
+      var remaining = document.getElementById("remaining").textContent;
+      var tenure = document.getElementById("tenure").textContent;
+      Kakao.Share.sendDefault({
+        objectType: "feed",
+        content: {
+          title: "내 잔여 연차는 " + remaining + "! (근속 " + tenure + ")",
+          description: "입사일만 입력하면 바로 계산되는 무료 연차 계산기",
+          imageUrl: "https://images.pexels.com/photos/5408818/pexels-photo-5408818.jpeg?auto=compress&cs=tinysrgb&w=1200",
+          link: {
+            mobileWebUrl: "https://annual-leave-calculator.pages.dev/",
+            webUrl: "https://annual-leave-calculator.pages.dev/"
+          }
+        },
+        buttons: [
+          {
+            title: "나도 계산해보기",
+            link: {
+              mobileWebUrl: "https://annual-leave-calculator.pages.dev/",
+              webUrl: "https://annual-leave-calculator.pages.dev/"
+            }
+          }
+        ]
+      });
+    });
+  })();
 </script>
 <script src="/theme.js"></script>
 </body>
