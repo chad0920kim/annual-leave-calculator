@@ -157,7 +157,13 @@ def format_inline(text):
     return "".join(out)
 
 
-def render_html(post, date_str):
+def pick_related(post, existing_posts, n=3):
+    same_cat = [p for p in existing_posts if p["category"] == post["category"]]
+    rest = [p for p in existing_posts if p["category"] != post["category"]]
+    return (same_cat + rest)[:n]
+
+
+def render_html(post, date_str, existing_posts):
     e = lambda s: html.escape(s, quote=True)
     title = post["title"]
     summary = post["summary"]
@@ -188,6 +194,36 @@ def render_html(post, date_str):
         indent=2,
     )
 
+    breadcrumb_ld = json.dumps(
+        {
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+                {"@type": "ListItem", "position": 1, "name": "홈", "item": f"{SITE_URL}/"},
+                {"@type": "ListItem", "position": 2, "name": "연차 이야기", "item": f"{SITE_URL}/blog/"},
+                {"@type": "ListItem", "position": 3, "name": title, "item": canonical},
+            ],
+        },
+        ensure_ascii=False,
+        indent=2,
+    )
+
+    related = pick_related(post, existing_posts)
+    related_items = "\n".join(
+        f'        <li><a href="/blog/{e(p["slug"])}.html">{e(p["title"])}</a></li>' for p in related
+    )
+    related_html = (
+        '    <section class="related-posts">\n      <h2>관련 글</h2>\n      <ul>\n'
+        f"{related_items}\n      </ul>\n    </section>\n"
+        if related
+        else ""
+    )
+    cta_html = (
+        '    <p class="post-cta">비슷한 상황이라면 <a href="/">연차 계산기</a>에서 '
+        '내 연차를 바로 확인해보거나, <a href="/guide.html">연차휴가 가이드</a>에서 '
+        "관련 법령과 계산 기준을 확인해보세요.</p>\n"
+    )
+
     return f"""<!doctype html>
 <html lang="ko">
 <head>
@@ -209,15 +245,23 @@ def render_html(post, date_str):
 <meta property="og:title" content="{e(title)}" />
 <meta property="og:description" content="{e(summary)}" />
 <meta property="og:type" content="article" />
+<meta property="og:site_name" content="직장인 연차 계산기" />
+<meta property="og:locale" content="ko_KR" />
 <meta property="og:url" content="{canonical}" />
 <meta property="og:image" content="{e(image)}" />
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content="{e(title)}" />
 <meta name="twitter:description" content="{e(summary)}" />
 <meta name="twitter:image" content="{e(image)}" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" />
 <link rel="stylesheet" href="/style.css" />
 <script type="application/ld+json">
 {json_ld}
+</script>
+<script type="application/ld+json">
+{breadcrumb_ld}
 </script>
 </head>
 <body>
@@ -243,6 +287,9 @@ def render_html(post, date_str):
 
     <article>
 {sections_html}    </article>
+
+{cta_html}
+{related_html}
     <p><a href="/blog/">&larr; 연차 이야기 목록으로</a></p>
   </main>
 
@@ -322,7 +369,7 @@ def main():
         "image": image,
     }
 
-    html_out = render_html(post, date_str)
+    html_out = render_html(post, date_str, posts)
     out_path = os.path.join(BLOG_DIR, f"{slug}.html")
     with open(out_path, "w", encoding="utf-8") as f:
         f.write(html_out)
