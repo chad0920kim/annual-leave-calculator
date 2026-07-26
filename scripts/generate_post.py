@@ -22,7 +22,7 @@ BLOG_DIR = os.path.join(ROOT, "blog")
 POSTS_JSON = os.path.join(BLOG_DIR, "posts.json")
 SITEMAP = os.path.join(ROOT, "sitemap.xml")
 
-SITE_URL = "https://annual-leave-calculator.pages.dev"
+SITE_URL = "https://yeoncha.onepixel.kr"
 CATEGORIES = ["제도 이해", "특수 고용형태", "휴직/복직", "퇴사/정산", "갈등 대응", "실사용 후기"]
 
 GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-2.5-flash")

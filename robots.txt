@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://annual-leave-calculator.pages.dev/sitemap.xml
+Sitemap: https://yeoncha.onepixel.kr/sitemap.xml
